@@ -27,7 +27,24 @@ public class AddressService {
 	@Autowired
 	private AddressRepository addressRepository;
 	
-	public Address save(Address address, String googleKey) throws MissingInformationException, NoDataFoundException, IntegrationException {
+	public Address create(Address address, String googleKey) throws MissingInformationException, NoDataFoundException, IntegrationException {
+		if ((address.getId() == null) || address.getId().equals(0L)) {
+			address.setId(null);
+			return save(address, googleKey);
+		} else {
+			throw new MissingInformationException("Invalid address identifier");
+		}
+	}
+
+	public Address update(Address address, String googleKey) throws MissingInformationException, NoDataFoundException, IntegrationException {
+		if ((address.getId() == null) || address.getId().equals(0L)) {
+			throw new MissingInformationException("Invalid address identifier");
+		}
+		queryById(address.getId());
+		return save(address, googleKey);
+	}
+
+	private Address save(Address address, String googleKey) throws MissingInformationException, NoDataFoundException, IntegrationException {
 		if (isAddressOk(address)) {
 			if (isMissingGeoInfo(address)) {
 				queryGeoInfo(address, googleKey);
@@ -54,7 +71,7 @@ public class AddressService {
 	}
 	
 	public Address remove(Long id) throws MissingInformationException, NoDataFoundException {
-		if (id == null) {
+		if ((id == null) || id.equals(0L)) {
 			throw new MissingInformationException();
 		} else {
 			Address result = queryById(id);
@@ -90,7 +107,7 @@ public class AddressService {
 	            address.setLongitude(location.lng);
 	            return true;
             } else {
-                throw new NoDataFoundException();
+                throw new NoDataFoundException("Latitude/Longitude not found for reported address.");
             }
         } catch (Exception err) {
             throw new IntegrationException(err);

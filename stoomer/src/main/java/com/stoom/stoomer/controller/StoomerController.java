@@ -5,12 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.stoom.stoomer.exception.IntegrationException;
 import com.stoom.stoomer.exception.MissingInformationException;
 import com.stoom.stoomer.exception.NoDataFoundException;
 import com.stoom.stoomer.model.entity.Address;
@@ -38,11 +40,27 @@ public class StoomerController {
 	 */
 	@PostMapping("/crud")
 	public ResponseEntity<Address> create(@RequestBody Address address) {
-		return commit(address);
+		try {
+			return new ResponseEntity<Address>(
+					addressService.create(address, configService.getGoogleKey()),
+					HttpStatus.OK
+					);
+		} catch (MissingInformationException err) {
+			return new ResponseEntity<Address>(address, HttpStatus.BAD_REQUEST);
+		} catch (IntegrationException err) {
+			return new ResponseEntity<Address>(address, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (NoDataFoundException err) {
+			return new ResponseEntity<Address>(address, HttpStatus.NOT_FOUND);
+		}
 	}
 	
+	/**
+	 * Address load per identifier
+	 * @param id
+	 * @return
+	 */
 	@GetMapping("/crud")
-	public ResponseEntity<Address[]> read(Long id) {
+	public ResponseEntity<Address[]> read(@PathVariable Long id) {
 		try {
 			if (id == null) {
 				return new ResponseEntity<Address[]>(
@@ -63,23 +81,24 @@ public class StoomerController {
 		}
 	}
 	
+	/**
+	 * Address changes
+	 * @param address
+	 * @return
+	 */
 	@PutMapping("/crud")
 	public ResponseEntity<Address> update(@RequestBody Address address) {
-		return commit(address);
-	}
-	
-	private ResponseEntity<Address> commit(@RequestBody Address address) {
 		try {
 			return new ResponseEntity<Address>(
-					addressService.save(address, configService.getGoogleKey()),
+					addressService.update(address, configService.getGoogleKey()),
 					HttpStatus.OK
 					);
 		} catch (MissingInformationException err) {
 			return new ResponseEntity<Address>(address, HttpStatus.BAD_REQUEST);
+		} catch (IntegrationException err) {
+			return new ResponseEntity<Address>(address, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (NoDataFoundException err) {
 			return new ResponseEntity<Address>(address, HttpStatus.NOT_FOUND);
-		} catch (Exception err) {
-			return new ResponseEntity<Address>(address, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	

@@ -43,6 +43,22 @@ public class Address {
 		setCountry(country);
 		setZipcode(zipcode);
 	}
+	
+	public Address(Long id, String streetName, String number, String complement, 
+			String neighbourhood, String city, String state, String country, String zipcode,
+			Double latitude, Double longitude) {
+		setId(id);
+		setStreetName(streetName);
+		setNumber(number);
+		setComplement(complement);
+		setNeighbourhood(neighbourhood);
+		setCity(city);
+		setState(state);
+		setCountry(country);
+		setZipcode(zipcode);
+		setLatitude(latitude);
+		setLongitude(longitude);
+	}
 
 	@Override
 	public String toString() {
