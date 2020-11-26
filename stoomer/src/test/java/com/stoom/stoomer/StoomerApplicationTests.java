@@ -52,16 +52,15 @@ class StoomerApplicationTests {
 		Logger.getLogger(this.getClass()).debug("addressReadingItemSuccess");
 		ResponseEntity<Address> preparation = stoomerController.create(getSuccessAddress());
 		assertThat(preparation.getStatusCode()).isEqualTo(HttpStatus.OK);
-		ResponseEntity<Address[]> result = stoomerController.read(preparation.getBody().getId());
+		ResponseEntity<Address> result = stoomerController.readById(preparation.getBody().getId());
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(result.getBody().length).isEqualTo(1);
-		assertThat(preparation.getBody().getId()).isEqualTo(result.getBody()[0].getId());
-		assertThat(preparation.getBody().getStreetName()).isEqualTo(result.getBody()[0].getStreetName());
-		assertThat(preparation.getBody().getNumber()).isEqualTo(result.getBody()[0].getNumber());
-		assertThat(preparation.getBody().getCity()).isEqualTo(result.getBody()[0].getCity());
-		assertThat(preparation.getBody().getState()).isEqualTo(result.getBody()[0].getState());
-		assertThat(preparation.getBody().getCountry()).isEqualTo(result.getBody()[0].getCountry());
-		assertThat(preparation.getBody().getZipcode()).isEqualTo(result.getBody()[0].getZipcode());
+		assertThat(preparation.getBody().getId()).isEqualTo(result.getBody().getId());
+		assertThat(preparation.getBody().getStreetName()).isEqualTo(result.getBody().getStreetName());
+		assertThat(preparation.getBody().getNumber()).isEqualTo(result.getBody().getNumber());
+		assertThat(preparation.getBody().getCity()).isEqualTo(result.getBody().getCity());
+		assertThat(preparation.getBody().getState()).isEqualTo(result.getBody().getState());
+		assertThat(preparation.getBody().getCountry()).isEqualTo(result.getBody().getCountry());
+		assertThat(preparation.getBody().getZipcode()).isEqualTo(result.getBody().getZipcode());
 	}
 
 	/**
@@ -74,7 +73,7 @@ class StoomerApplicationTests {
 		assertThat(preparation1.getStatusCode()).isEqualTo(HttpStatus.OK);
 		ResponseEntity<Address> preparation2 = stoomerController.create(getSuccessAddress());
 		assertThat(preparation2.getStatusCode()).isEqualTo(HttpStatus.OK);
-		ResponseEntity<Address[]> result = stoomerController.read(null);
+		ResponseEntity<Address[]> result = stoomerController.readAll();
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(result.getBody().length).isGreaterThanOrEqualTo(2);
 	}
@@ -85,7 +84,7 @@ class StoomerApplicationTests {
 	@Test
 	public void addressReadingNotFound() {
 		Logger.getLogger(this.getClass()).debug("addressReadingNotFound");
-		ResponseEntity<Address[]> result = stoomerController.read(Long.MAX_VALUE);
+		ResponseEntity<Address> result = stoomerController.readById(Long.MAX_VALUE);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
@@ -105,11 +104,10 @@ class StoomerApplicationTests {
 		ResponseEntity<Address> preparation3 = stoomerController.update(preparation2.getBody());
 		assertThat(preparation3.getStatusCode()).isEqualTo(HttpStatus.OK);
 		// load entity changed
-		ResponseEntity<Address[]> result = stoomerController.read(preparation3.getBody().getId());
+		ResponseEntity<Address> result = stoomerController.readById(preparation3.getBody().getId());
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(result.getBody().length).isEqualTo(1);
-		assertThat(result.getBody()[0].getStreetName()).isEqualTo(preparation1.getStreetName().toUpperCase());
-		assertThat(result.getBody()[0].getStreetName()).isEqualTo(preparation2.getBody().getStreetName());
+		assertThat(result.getBody().getStreetName()).isEqualTo(preparation1.getStreetName().toUpperCase());
+		assertThat(result.getBody().getStreetName()).isEqualTo(preparation2.getBody().getStreetName());
 	}
 
 	/**
@@ -149,7 +147,7 @@ class StoomerApplicationTests {
 		ResponseEntity<Address> preparation2 = stoomerController.delete(preparation1.getBody().getId());
 		assertThat(preparation2.getStatusCode()).isEqualTo(HttpStatus.OK);
 		// double check removal
-		ResponseEntity<Address[]> preparation3 = stoomerController.read(preparation1.getBody().getId());
+		ResponseEntity<Address> preparation3 = stoomerController.readById(preparation1.getBody().getId());
 		assertThat(preparation3.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 

@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +18,10 @@ import com.stoom.stoomer.model.entity.Address;
 import com.stoom.stoomer.service.AddressService;
 import com.stoom.stoomer.service.ConfigService;
 
+/**
+ * Rest interface for Address CRUD.
+ * @author guspadilha
+ */
 @RestController
 @RequestMapping("/address")
 public class StoomerController {
@@ -57,34 +60,34 @@ public class StoomerController {
 	/**
 	 * Address load per identifier
 	 * @param id
-	 * @return
+	 * @return Address request object and...
+	 * <br> ...HttpStatus.OK for success search.
+	 * <br> ...HttpStatus.NOT_FOUND when 'Address' is not found by 'Id'.
 	 */
 	@GetMapping("/crud")
-	public ResponseEntity<Address[]> read(@PathVariable Long id) {
+	public ResponseEntity<Address> readById(@RequestBody Long id) {
 		try {
-			if (id == null) {
-				return new ResponseEntity<Address[]>(
-						addressService.queryAll(), 
-						HttpStatus.OK
-						);
-			} else {
-				return new ResponseEntity<Address[]>(
-						new Address[] {addressService.queryById(id)},
-						HttpStatus.OK
-						);
-			}
+			return new ResponseEntity<Address>(addressService.queryById(id), HttpStatus.OK);
 		} catch (NoDataFoundException err) {
-			return new ResponseEntity<Address[]>(
-					new Address[] { },
-					HttpStatus.NOT_FOUND
-					);
+			return new ResponseEntity<Address>(HttpStatus.NOT_FOUND);
 		}
+	}
+	
+	/**
+	 * Address (full) list (could be paginated, but this is just a CRUD).
+	 * @return List within all address
+	 */
+	@GetMapping("/list")
+	public ResponseEntity<Address[]> readAll() {
+		return new ResponseEntity<Address[]>(
+				addressService.queryAll(), 
+				HttpStatus.OK
+				);
 	}
 	
 	/**
 	 * Address changes
 	 * @param address
-	 * @return
 	 */
 	@PutMapping("/crud")
 	public ResponseEntity<Address> update(@RequestBody Address address) {

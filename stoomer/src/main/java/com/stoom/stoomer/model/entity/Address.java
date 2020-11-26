@@ -6,7 +6,7 @@ package com.stoom.stoomer.model.entity;
  * REQUIRED: id, streetName, number, neighbourhood, city, state, country, zipcode, 
  * OPTIONAL: complement, latitude, longitude
  * 
- * @author Gustavo Padilha gupadilha[at]gmail.com
+ * @author guspadilha
  */
 
 @javax.persistence.Entity
